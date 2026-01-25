@@ -1,0 +1,60 @@
+services:
+  # 1. The Database Service
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    container_name: hylla_db
+    environment:
+      MYSQL_ROOT_PASSWORD: change_me  # Change this!
+      MYSQL_DATABASE: hylla_db
+      MYSQL_USER: hylla_user          # <--- Matches below
+      MYSQL_PASSWORD: change_me       # <--- Matches below
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - hylla_net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Your Application Service (Renamed from movie-gui)
+  hylla:
+    build: .
+    restart: unless-stopped
+    container_name: hylla_app       # Consistent naming
+    ports:
+      - "5051:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database Config (Internal Docker DNS)
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=hylla_db
+      - DB_USER=hylla_user      # <--- Matches the DB service above
+      - DB_PASSWORD=change_me   # <--- Matches the DB service above
+      
+      # App Secrets (Fill these in!)
+      - OIDC_CLIENT_ID=
+      - OIDC_CLIENT_SECRET=
+      - OIDC_METADATA_URL=https://auth.example.com/application/o/hylla/.well-known/openid-configuration
+      - OIDC_ADMIN_GROUP=Hylla_Admins
+      - FLASK_SECRET_KEY=change_me_to_random_string
+      
+      # External APIs
+      - TMDB_API_KEY=
+      - OMDB_API_KEY=
+      
+    volumes:
+      - ./static/uploads:/app/static/uploads
+    networks:
+      - hylla_net
+
+volumes:
+  db_data:
+
+networks:
+  hylla_net:
