@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# --- Custom Hylla Rules ---
+
+# Docker overrides (if you use them locally)
+docker-compose.override.yml
+
+# User Uploads (Keep the folder, ignore the files)
+static/uploads/*
+!static/uploads/.gitkeep
