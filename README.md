@@ -1,8 +1,8 @@
 # Hylla 📀
 
-![Build Status](https://github.com/Mezhona/Hylla/actions/workflows/publish.yml/badge.svg)
-![License](https://img.shields.io/github/license/Mezhona/Hylla?cacheSeconds=1)
-![Docker Image Size](https://img.shields.io/ghcr/size/mezhona/hylla/latest)
+[![Build Status](https://github.com/Mezhona/Hylla/actions/workflows/publish.yml/badge.svg)](https://github.com/Mezhona/Hylla/actions)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-v1.0.0-blue)
 
 **Hylla** (Norwegian for *"Shelf"*) is a robust, self-hosted media manager designed for collectors who straddle the line between physical media and digital libraries. 
 
