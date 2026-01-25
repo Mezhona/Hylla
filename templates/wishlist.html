@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0 fw-bold" style="color: var(--text-color);">
+        <i class="bi bi-bag-heart-fill text-danger me-2"></i>Wishlist
+    </h2>
+    <a href="/add" class="btn btn-warning fw-bold">
+        <i class="bi bi-plus-lg"></i> Add Item
+    </a>
+</div>
+
+{% if not items %}
+<div class="text-center py-5">
+    <div class="mb-3 text-muted" style="font-size: 4rem;"><i class="bi bi-cart-x"></i></div>
+    <h4 class="text-muted">Your wishlist is empty.</h4>
+    <p class="text-muted small">Go add some movies you want to buy!</p>
+</div>
+{% else %}
+
+<div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-4">
+    {% for item in items %}
+    <div class="col">
+        <div class="card h-100 shadow-sm border-0 position-relative">
+            <span class="position-absolute top-0 end-0 m-2 badge shadow-sm border
+                {% if item.priority == 'High' %}bg-danger{% elif item.priority == 'Medium' %}bg-primary{% else %}bg-secondary{% endif %}">
+                {{ item.priority }}
+            </span>
+
+            <img src="{{ item.poster if item.poster else 'https://via.placeholder.com/300x450?text=No+Poster' }}" 
+                 class="card-img-top rounded shadow" alt="{{ item.title }}">
+            
+            <div class="card-body p-2 text-center">
+                <h6 class="card-title mb-0 text-truncate" style="color: var(--text-color);">{{ item.title }}</h6>
+                <small class="text-muted">{{ item.year }}</small>
+            </div>
+            
+            <div class="card-footer bg-transparent border-top border-secondary p-2 d-flex justify-content-between">
+                <form action="/wishlist/move/{{ item.id }}" method="POST">
+                    <button type="submit" class="btn btn-sm btn-success" title="Bought it! Move to Collection">
+                        <i class="bi bi-check-lg"></i>
+                    </button>
+                </form>
+                <form action="/wishlist/delete/{{ item.id }}" method="POST" onsubmit="return confirm('Remove from wishlist?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Remove">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

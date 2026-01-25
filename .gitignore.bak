@@ -1,0 +1,19 @@
+# Python / Flask
+__pycache__/
+*.pyc
+venv/
+.env
+
+# OS Junk
+.DS_Store
+Thumbs.db
+
+# Database (If you ever run locally)
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# User Uploads (Don't commit your personal logo uploads!)
+static/uploads/*
+!static/uploads/.gitkeep

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - hylla DB</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+            padding: 2rem;
+        }
+        .btn-auth {
+            background-color: #238636;
+            color: #ffffff;
+            border: 1px solid rgba(240,246,252,0.1);
+            font-weight: 600;
+        }
+        .btn-auth:hover {
+            background-color: #2ea043;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card text-center">
+        <div class="mb-4">
+            <img src="{{ site_logo }}" alt="Logo" style="height: 80px; margin-bottom: 20px; object-fit: contain;">
+            <h1 class="h3 mb-3 fw-bold" style="color: #ffffff;">Welcome Back</h1>
+            <p class="text-muted small">Please sign in to access the Media Database.</p>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="/login" class="btn btn-auth btn-lg">
+                <i class="bi bi-shield-lock-fill me-2"></i>Sign in with Authentik
+            </a>
+        </div>
+
+        <div class="mt-4 pt-3 border-top border-secondary">
+            <p class="text-muted small mb-0">Protected System &bull; Authorized Access Only</p>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-transparent border-bottom border-secondary py-3 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold" style="color: var(--primary-color);">
+                    <i class="bi bi-shield-lock-fill me-2"></i>User Management
+                </h4>
+                <span class="badge bg-secondary">{{ users|length }} Users Registered</span>
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="color: var(--text-color);">
+                        <thead class="bg-light" style="background-color: rgba(255,255,255,0.05)!important;">
+                            <tr>
+                                <th class="ps-4">User</th>
+                                <th>Role</th>
+                                <th>Theme</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr style="border-color: var(--border-color);">
+                                <td class="ps-4">
+                                    <div class="fw-bold">{{ u.username or 'Unknown' }}</div>
+                                    <div class="small text-muted" style="font-size: 0.85em;">{{ u.email or 'No Email' }}</div>
+                                    <div class="small text-muted font-monospace" style="font-size: 0.7em;">ID: {{ u.user_id[:8] }}...</div>
+                                </td>
+                                <td>
+                                    {% if u.role == 'admin' %}
+                                        <span class="badge bg-danger">Admin</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Member</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-dark border border-secondary">{{ u.theme }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    {% if u.user_id == current_user_id %}
+                                        <span class="text-muted small fst-italic">Current User</span>
+                                    {% else %}
+                                        <div class="d-flex justify-content-end gap-2">
+                                            {% if u.role == 'member' %}
+                                            <form action="/admin/promote/{{ u.user_id }}" method="POST">
+                                                <button class="btn btn-sm btn-outline-success fw-bold" title="Promote to Admin">
+                                                    <i class="bi bi-arrow-up-circle"></i>
+                                                </button>
+                                            </form>
+                                            {% else %}
+                                            <form action="/admin/demote/{{ u.user_id }}" method="POST">
+                                                <button class="btn btn-sm btn-outline-warning fw-bold" title="Demote to Member">
+                                                    <i class="bi bi-arrow-down-circle"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                            
+                                            <form action="/admin/delete/{{ u.user_id }}" method="POST" onsubmit="return confirm('Delete user {{ u.username }}? This cannot be undone.');">
+                                                <button class="btn btn-sm btn-outline-danger" title="Delete User">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

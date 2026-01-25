@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card p-4 shadow">
+            <h2 class="mb-4" style="color: var(--primary-color);">Settings</h2>
+            
+            <div class="mb-5 border-bottom pb-4" style="border-color: var(--border-color)!important;">
+                <h5 class="fw-bold mb-3">Appearance (User Preference)</h5>
+                <form method="POST" class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <button type="submit" name="theme_selection" value="default" 
+                                class="btn w-100 p-3 border d-flex flex-column align-items-center gap-2 {% if user_theme == 'default' %}ring-active{% endif %}" 
+                                style="background-color: #0b0e11; color: #33aba0;">
+                            <i class="bi bi-palette-fill fs-4"></i>
+                            <span class="small fw-bold">Default</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button type="submit" name="theme_selection" value="dark" 
+                                class="btn w-100 p-3 border d-flex flex-column align-items-center gap-2 {% if user_theme == 'dark' %}ring-active{% endif %}" 
+                                style="background-color: #000; color: #7d8590;">
+                            <i class="bi bi-moon-stars-fill fs-4"></i>
+                            <span class="small fw-bold">Dark</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button type="submit" name="theme_selection" value="warm" 
+                                class="btn w-100 p-3 border d-flex flex-column align-items-center gap-2 {% if user_theme == 'warm' %}ring-active{% endif %}" 
+                                style="background-color: #1e1e1e; color: #d29922;">
+                            <i class="bi bi-sun-fill fs-4"></i>
+                            <span class="small fw-bold">Warm</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <button type="submit" name="theme_selection" value="light" 
+                                class="btn w-100 p-3 border d-flex flex-column align-items-center gap-2 {% if user_theme == 'light' %}ring-active{% endif %}" 
+                                style="background-color: #fff; color: #0969da;">
+                            <i class="bi bi-brightness-high-fill fs-4"></i>
+                            <span class="small fw-bold">Light</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {% if user_role == 'admin' %}
+            
+            <form method="POST" enctype="multipart/form-data" action="/admin/settings/logo" class="mb-5 border-bottom pb-4" style="border-color: var(--border-color)!important;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0">Site Branding</h5>
+                    <span class="badge bg-danger">Admin Area</span>
+                </div>
+                <div class="mb-3">
+                    <label for="logoFile" class="form-label small text-muted">Upload Custom Logo (PNG/JPG, max 2MB)</label>
+                    <div class="input-group">
+                        <input class="form-control bg-dark text-white border-secondary" type="file" id="logoFile" name="logo_file" accept=".png,.jpg,.jpeg">
+                        <button class="btn btn-primary fw-bold" type="submit">Upload & Apply</button>
+                    </div>
+                    <div class="form-text small">Replaces the top-left logo and login screen image immediately.</div>
+                </div>
+            </form>
+
+            <form method="POST">
+                <h5 class="fw-bold mb-3">Server Configuration</h5>
+                
+                <div class="alert alert-info border-info small" style="background-color: rgba(13, 202, 240, 0.1); color: var(--text-color);">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    API Keys (TMDB/OMDB) are now managed in your <code>docker-compose.yml</code> file for better security.
+                </div>
+                
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" name="edit_mode" id="editMode" {% if settings['edit_mode'] == '1' %}checked{% endif %}>
+                    <label class="form-check-label" for="editMode">Enable Edit Mode (Danger Zone)</label>
+                    <div class="form-text small">Enables delete buttons and edit features for all users.</div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" name="edit_mode" class="btn btn-warning px-4 fw-bold">Save Server Settings</button>
+                </div>
+            </form>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    .ring-active {
+        border: 2px solid var(--primary-color) !important;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+</style>
+{% endblock %}

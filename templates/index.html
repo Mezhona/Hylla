@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3 col-md-4 mb-4">
+        <button class="btn btn-warning w-100 mb-3 d-md-none fw-bold d-flex justify-content-between align-items-center" 
+                type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+            <span><i class="bi bi-funnel-fill me-2"></i>Show/Hide Filters</span>
+            <i class="bi bi-chevron-down"></i>
+        </button>
+
+        <div class="collapse d-md-block" id="filterCollapse">
+            <div class="card p-3 sticky-top" style="top: 100px; z-index: 100;">
+                <form method="GET" action="/">
+                    <input type="hidden" name="q" value="{{ search_query }}">
+                    
+                    <h6 class="text-uppercase fw-bold mb-3 small" style="color: var(--primary-color);">Sort By</h6>
+                    <select name="sort_by" class="form-select mb-4 shadow-none" onchange="this.form.submit()">
+                        <option value="title_asc" {% if current_sort == 'title_asc' %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="title_desc" {% if current_sort == 'title_desc' %}selected{% endif %}>Name (Z-A)</option>
+                        <option value="genre_asc" {% if current_sort == 'genre_asc' %}selected{% endif %}>Genre (A-Z)</option>
+                        <option value="year_desc" {% if current_sort == 'year_desc' %}selected{% endif %}>Year (Newest)</option>
+                        <option value="rating_desc" {% if current_sort == 'rating_desc' %}selected{% endif %}>Rating (High to Low)</option>
+                    </select>
+
+                    <hr class="mb-4" style="border-color: var(--border-color);">
+                    
+                    <h6 class="text-uppercase fw-bold mb-3 small" style="color: var(--primary-color);">Eras</h6>
+                    <select name="decade" class="form-select mb-4 shadow-none" onchange="this.form.submit()">
+                        <option value="">All Eras</option>
+                        {% for d in [2020, 2010, 2000, 1990, 1980, 1970, 1960] %}
+                        <option value="{{ d }}" {% if current_decade == d|string %}selected{% endif %}>{{ d }}s</option>
+                        {% endfor %}
+                    </select>
+
+                    <h6 class="text-uppercase fw-bold mb-3 small" style="color: var(--primary-color);">Genres</h6>
+                    <div class="genre-list overflow-auto pe-2" style="max-height: 400px;">
+                        {% for g in genres %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input custom-check" type="checkbox" name="genre" value="{{ g }}" 
+                                   id="genre_{{ loop.index }}" onchange="this.form.submit()"
+                                   {% if g in selected_genres %}checked{% endif %}>
+                            <label class="form-check-label small" for="genre_{{ loop.index }}" style="cursor: pointer;">
+                                {{ g }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if selected_genres or current_decade or search_query or current_sort != 'title_asc' %}
+                    <hr class="mt-3" style="border-color: var(--border-color);">
+                    <a href="/" class="btn btn-sm btn-outline-danger w-100 fw-bold">
+                        <i class="bi bi-x-lg me-1"></i>Reset View
+                    </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9 col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Collection <span class="text-muted small">({{ movies|length }})</span></h4>
+        </div>
+
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4">
+            {% for movie in movies %}
+            <div class="col">
+                <a href="/movie/{{ movie.id }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm border-0 position-relative">
+                        {% if movie.rating %}
+                        <span class="position-absolute top-0 end-0 m-2 badge opacity-75 shadow-sm border" 
+                              style="background-color: var(--bg-color); border-color: var(--border-color); color: #fff;">
+                            <i class="bi bi-star-fill text-warning"></i> {{ movie.rating }}
+                        </span>
+                        {% endif %}
+
+                        <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1">
+                            {% if movie.is_locked %}
+                            <span class="badge bg-warning text-dark shadow-sm" title="Metadata Locked">
+                                <i class="bi bi-lock-fill"></i>
+                            </span>
+                            {% endif %}
+
+                            {% if movie.is_ripped %}
+                            <span class="badge bg-success shadow-sm" title="Available on Plex">
+                                <i class="bi bi-play-circle-fill"></i> Plex
+                            </span>
+                            {% endif %}
+                            
+                            {% if movie.media_format == '4K Blu-ray' %}
+                                <span class="badge bg-dark border border-secondary shadow-sm">4K</span>
+                            {% elif movie.media_format == 'Blu-ray' %}
+                                <span class="badge bg-primary shadow-sm">BD</span>
+                            {% elif movie.media_format == 'DVD' %}
+                                <span class="badge bg-secondary shadow-sm">DVD</span>
+                            {% elif movie.media_format == 'Digital' %}
+                                <span class="badge bg-info text-dark shadow-sm">DIG</span>
+                            {% endif %}
+                        </div>
+
+                        <img src="{{ movie.poster if movie.poster else 'https://via.placeholder.com/300x450?text=No+Poster' }}" 
+                             class="card-img-top rounded shadow" alt="{{ movie.title }}">
+                        
+                        <div class="card-body p-2 text-center">
+                            <h6 class="card-title mb-0 text-truncate" style="color: var(--text-color);">{{ movie.title }}</h6>
+                            <small class="text-muted">{{ movie.year }}</small>
+                            
+                            {% if movie.placement %}
+                            <div class="mt-2">
+                                <span class="badge bg-secondary text-light fw-normal" 
+                                      style="font-size: 0.7rem; opacity: 0.8;">
+                                    <i class="bi bi-geo-alt-fill me-1"></i>{{ movie.placement }}
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-check:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .genre-list::-webkit-scrollbar { width: 5px; }
+    .genre-list::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+</style>
+{% endblock %}

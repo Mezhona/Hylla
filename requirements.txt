@@ -1,0 +1,4 @@
+Flask
+requests
+Authlib
+mysql-connector-python

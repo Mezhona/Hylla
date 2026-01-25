@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: var(--primary-color);">
+            <i class="bi bi-bar-chart-fill me-2"></i>Collection Statistics
+        </h2>
+        <a href="/admin/users" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-people-fill me-2"></i>Manage Users
+        </a>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm text-center p-3">
+                <div class="display-4 fw-bold mb-1">{{ stats.total }}</div>
+                <div class="text-muted text-uppercase small fw-bold">Total Movies</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm text-center p-3">
+                <div class="display-4 fw-bold mb-1 text-success">{{ stats.ripped }}</div>
+                <div class="text-muted text-uppercase small fw-bold">Digitized (Plex)</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm text-center p-3">
+                <div class="display-4 fw-bold mb-1 text-warning">{{ stats.locked }}</div>
+                <div class="text-muted text-uppercase small fw-bold">Metadata Locked</div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm p-3">
+                <h6 class="text-muted text-uppercase small fw-bold mb-3 border-bottom pb-2">By Format</h6>
+                <div class="overflow-auto" style="max-height: 100px;">
+                    {% for fmt in stats.formats %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ fmt.format }}</span>
+                        <span class="badge bg-secondary">{{ fmt.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-transparent border-bottom border-secondary py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Incomplete Metadata
+            </h5>
+            <span class="badge bg-danger">{{ incomplete_movies|length }} Found</span>
+        </div>
+        <div class="card-body p-0">
+            {% if incomplete_movies %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" style="color: var(--text-color);">
+                        <thead class="bg-light" style="background-color: rgba(255,255,255,0.05)!important;">
+                            <tr>
+                                <th class="ps-4">Title</th>
+                                <th>Missing Fields</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in incomplete_movies %}
+                            <tr style="border-color: var(--border-color);">
+                                <td class="ps-4 fw-bold">
+                                    <a href="/movie/{{ m.id }}" class="text-decoration-none" style="color: var(--primary-color);">
+                                        {{ m.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if not m.year %}<span class="badge bg-secondary me-1">Year</span>{% endif %}
+                                    {% if not m.genre %}<span class="badge bg-secondary me-1">Genre</span>{% endif %}
+                                    {% if not m.poster %}<span class="badge bg-secondary me-1">Poster</span>{% endif %}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a href="/movie/edit/{{ m.id }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pencil-fill"></i> Fix
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                    <h5>All Clear!</h5>
+                    <p>Every movie in your database has basic metadata.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
