@@ -11,7 +11,7 @@
 
 While Plex/Jellyfin manage your *files*, **Hylla** manages your *ownership*.
 
-## ✨ Features
+##  Features
 
 * **Physical vs. Digital Tracking:** Distinctly track which movies you own on Blu-ray/DVD versus what you have digitally available.
 * **Auto-Metadata:** Semi-automatically fetches posters, plot summaries, and release dates via TMDB/OMDB APIs.
@@ -21,7 +21,7 @@ While Plex/Jellyfin manage your *files*, **Hylla** manages your *ownership*.
 
 ---
 
-## 🚀 Quick Start (No Building Required)
+##  Quick Start (No Building Required)
 
 You do not need to download the source code to run Hylla. You can simply use `docker-compose` to pull the latest pre-built image.
 
