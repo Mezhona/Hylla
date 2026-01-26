@@ -1,0 +1,54 @@
+/* static/css/style.css */
+
+/* --- Card Tweaks --- */
+.movie-card {
+    background-color: #212529; /* Darker background for contrast */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s;
+}
+
+.movie-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Professional Badges --- */
+.movie-meta {
+    display: flex;
+    gap: 8px; /* Consistent spacing between badges */
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+/* Base style for ALL badges */
+.format-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    font-size: 0.75rem;     /* Smaller, cleaner font */
+    font-weight: 600;       /* Semi-bold for readability */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    border: 1px solid transparent; /* Prepare for border */
+}
+
+/* Physical Media (Gold/Premium Look) */
+.badge-physical {
+    background-color: rgba(255, 193, 7, 0.15); /* Low opacity gold */
+    color: #ffc107;                            /* Bright gold text */
+    border-color: rgba(255, 193, 7, 0.3);      /* Subtle border */
+}
+
+/* Digital Media (Tech/Cyber Blue Look) */
+.badge-digital {
+    background-color: rgba(13, 202, 240, 0.15); /* Low opacity cyan */
+    color: #0dcaf0;                             /* Bright cyan text */
+    border-color: rgba(13, 202, 240, 0.3);
+}
+
+/* Icons inside badges */
+.format-badge i {
+    font-size: 0.9rem; /* Slightly larger icon */
+}

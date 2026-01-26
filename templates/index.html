@@ -47,6 +47,20 @@
                         {% endfor %}
                     </div>
 
+                    <div class="movie-meta">
+                        {% if movie.physical_format %}
+                            <span class="icon-physical" title="Physical: {{ movie.physical_format }}">
+                                <i class="fa-solid fa-compact-disc"></i> {{ movie.physical_format }}
+                            </span>
+                        {% endif %}
+
+                        {% if movie.digital_path %}
+                            <span class="icon-digital" title="Digital Available">
+                                <i class="fa-solid fa-server"></i> Digital
+                            </span>
+                        {% endif %}
+                    </div>
+
                     {% if selected_genres or current_decade or search_query or current_sort != 'title_asc' %}
                     <hr class="mt-3" style="border-color: var(--border-color);">
                     <a href="/" class="btn btn-sm btn-outline-danger w-100 fw-bold">
