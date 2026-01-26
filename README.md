@@ -1,4 +1,7 @@
-# Hylla 📀
+# Hylla
+
+<img width="1334" height="770" alt="image" src="https://github.com/user-attachments/assets/8b4ffb20-4647-4e12-beee-5638f6c05545" />
+
 
 [![Build Status](https://github.com/Mezhona/Hylla/actions/workflows/publish.yml/badge.svg)](https://github.com/Mezhona/Hylla/actions)
 ![License](https://img.shields.io/badge/license-MIT-green)
