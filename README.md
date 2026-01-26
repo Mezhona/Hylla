@@ -7,14 +7,14 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Version](https://img.shields.io/badge/version-v1.0.0-blue)
 
-**Hylla** (Norwegian for *"Shelf"*) is a robust, self-hosted media manager designed for collectors who straddle the line between physical media and digital libraries. 
+**Hylla** (Norwegian for *"Shelf"*) is a simple, self-hosted media manager designed for collectors who straddle the line between physical media and digital libraries. 
 
 While Plex/Jellyfin manage your *files*, **Hylla** manages your *ownership*.
 
 ## ✨ Features
 
 * **Physical vs. Digital Tracking:** Distinctly track which movies you own on Blu-ray/DVD versus what you have digitally available.
-* **Auto-Metadata:** Automatically fetches posters, plot summaries, and release dates via TMDB/OMDB APIs.
+* **Auto-Metadata:** Semi-automatically fetches posters, plot summaries, and release dates via TMDB/OMDB APIs.
 * **Audit Logging:** A persistent, immutable history of every change (e.g., *"User X changed rating from 4.0 → 5.0"*).
 * **Enterprise Security:** Built-in support for OIDC (OpenID Connect) to integrate with Authentik, Keycloak, or Google.
 * **Self-Healing Database:** The container automatically initializes its own database tables on the first run.
