@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # We will set IMAGE_NAME dynamically in the steps to ensure it is lowercase
   APP_PORT: 5000
 
 jobs:
@@ -21,6 +21,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # --- NEW STEP: FORCE LOWERCASE IMAGE NAME ---
+      - name: Lowercase Image Name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -49,32 +54,29 @@ jobs:
           context: .
           load: true
           push: false
+          # This will now use the lowercase name from the step above
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 2. Run Smoke Tests (UPDATED with SKIP_DB_INIT)
+      # 2. Run Smoke Tests
       - name: Test Docker Image (Smoke Test)
         run: |
           echo "Starting container for smoke testing..."
           # Added -e SKIP_DB_INIT=true to bypass database connection check
           docker run -d --name test-container -e SKIP_DB_INIT=true -p ${{ env.APP_PORT }}:${{ env.APP_PORT }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
           
-          # Sleep to let the app initialize
           sleep 10
           
-          # Check if container is still running
           if [ ! "$(docker ps -q -f name=test-container)" ]; then
             echo "Container crashed immediately!"
             docker logs test-container
             exit 1
           fi
 
-          # Test endpoint with curl
           echo "Testing application response..."
           curl --fail --retry 3 --retry-delay 5 http://localhost:${{ env.APP_PORT }} || (docker logs test-container && exit 1)
           
-          # Cleanup
           docker stop test-container && docker rm test-container
           echo "Smoke test passed!"
 
