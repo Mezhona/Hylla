@@ -3,58 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - hylla DB</title>
+    <title>Welcome - Hylla</title>
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/bootstrap-icons.css') }}" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: rgba(22, 27, 34, 0.85); /* More transparent for glass effect */
+            --text-main: #ffffff;
+            --text-muted: #8b949e; /* Lighter than before for visibility */
+            --accent-color: #238636;
+            --accent-hover: #2ea043;
+            --border-color: #30363d;
+        }
+
         body {
-            background-color: #0d1117;
-            color: #c9d1d9;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             height: 100vh;
+            margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden; /* Prevent scrollbars from canvas */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            position: relative;
         }
-        .login-card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            max-width: 400px;
+
+        /* Background Canvas */
+        #shelf-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 2rem;
+            height: 100%;
+            z-index: -1;
+            filter: blur(8px); /* The requested blur effect */
+            opacity: 0.6;
         }
+
+        .login-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px); /* Glassmorphism blur behind the card */
+            -webkit-backdrop-filter: blur(10px);
+            max-width: 400px;
+            width: 90%;
+            padding: 2.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-img {
+            height: 80px;
+            margin-bottom: 24px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        h1 {
+            color: var(--text-main);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .text-instructions {
+            color: #c9d1d9; /* Much lighter than 'text-muted' */
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
         .btn-auth {
-            background-color: #238636;
+            background-color: var(--accent-color);
             color: #ffffff;
-            border: 1px solid rgba(240,246,252,0.1);
+            border: 1px solid rgba(240, 246, 252, 0.1);
             font-weight: 600;
+            padding: 12px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+
         .btn-auth:hover {
-            background-color: #2ea043;
+            background-color: var(--accent-hover);
             color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(35, 134, 54, 0.4);
+        }
+
+        .footer-text {
+            color: #8b949e; /* Lighter gray for better visibility */
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .border-top-custom {
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            padding-top: 1.5rem;
         }
     </style>
 </head>
 <body>
 
+    <canvas id="shelf-canvas"></canvas>
+
     <div class="login-card text-center">
-        <div class="mb-4">
-            <img src="{{ site_logo }}" alt="Logo" style="height: 80px; margin-bottom: 20px; object-fit: contain;">
-            <h1 class="h3 mb-3 fw-bold" style="color: #ffffff;">Welcome Back</h1>
-            <p class="text-muted small">Please sign in to access the Media Database.</p>
+        <div class="mb-3">
+            <img src="{{ site_logo }}" alt="Hylla Logo" class="logo-img">
+            <h1 class="h3 mb-2">Welcome Back</h1>
+            <p class="text-instructions">Please sign in to access the Media Database.</p>
         </div>
 
         <div class="d-grid gap-2">
-            <a href="/login" class="btn btn-auth btn-lg">
-                <i class="bi bi-shield-lock-fill me-2"></i>Sign in with Authentik
+            <a href="/login" class="btn btn-auth btn-lg rounded-3">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>Sign in with Authentik</span>
             </a>
         </div>
 
-        <div class="mt-4 pt-3 border-top border-secondary">
-            <p class="text-muted small mb-0">Protected System &bull; Authorized Access Only</p>
+        <div class="border-top-custom">
+            <p class="footer-text mb-0">
+                <i class="bi bi-lock-fill me-1"></i> Protected System &bull; Authorized Access Only
+            </p>
         </div>
     </div>
 
+    <script>
+        /**
+         * Hylla Dynamic Background
+         * Creates a scrolling "bookshelf" effect where books randomly disappear.
+         */
+        const canvas = document.getElementById('shelf-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let books = [];
+        const shelfHeight = 120; // Height of one shelf row
+        const bookWidthMin = 15;
+        const bookWidthMax = 40;
+        const bookGap = 2;
+        const speed = 0.5; // How fast the shelves scroll sideways
+        
+        // Colors for the books (muted professional tones)
+        const colors = [
+            '#238636', // Hylla Green
+            '#1f6feb', // Blue
+            '#a371f7', // Purple
+            '#d29922', // Gold/Yellow
+            '#30363d', // Dark Grey
+            '#8b949e'  // Light Grey
+        ];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initShelves();
+        }
+
+        class Book {
+            constructor(x, y, h, color) {
+                this.x = x;
+                this.y = y;
+                this.w = Math.random() * (bookWidthMax - bookWidthMin) + bookWidthMin;
+                this.h = h * (0.7 + Math.random() * 0.25); // Varying height relative to shelf
+                this.color = color;
+                this.alpha = 1; // For fading out
+                this.removed = false;
+                this.removeDelay = Math.random() * 10000; // Random time before removal
+            }
+
+            update() {
+                // Scroll movement
+                this.x -= speed;
+                
+                // Wrap around screen
+                if (this.x + this.w < 0) {
+                    this.x = width;
+                    this.removed = false;
+                    this.alpha = 1;
+                }
+
+                // Randomly remove book
+                if (!this.removed && Math.random() < 0.001) { // 0.1% chance per frame to trigger removal
+                     this.removed = true;
+                }
+
+                // Fade out effect
+                if (this.removed && this.alpha > 0) {
+                    this.alpha -= 0.05;
+                }
+            }
+
+            draw() {
+                if (this.alpha <= 0) return;
+                
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                // Draw book spine
+                ctx.fillRect(this.x, this.y - this.h, this.w, this.h);
+                
+                // Draw little spine detail (highlight)
+                ctx.fillStyle = "rgba(255,255,255,0.1)";
+                ctx.fillRect(this.x + 2, this.y - this.h, 2, this.h);
+                
+                ctx.globalAlpha = 1; // Reset alpha
+            }
+        }
+
+        function initShelves() {
+            books = [];
+            const rows = Math.ceil(height / shelfHeight);
+            
+            for (let r = 0; r < rows; r++) {
+                let currentX = 0;
+                // Add an offset to every other row for visual variety
+                if(r % 2 !== 0) currentX = -50; 
+
+                const y = (r + 1) * shelfHeight;
+                
+                // Fill row with books
+                while (currentX < width + 200) { // +200 buffer for scrolling
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const book = new Book(currentX, y, shelfHeight - 10, color);
+                    books.push(book);
+                    currentX += book.w + bookGap;
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw shelf lines
+            ctx.strokeStyle = '#30363d';
+            ctx.lineWidth = 4;
+            const rows = Math.ceil(height / shelfHeight);
+            for(let r = 1; r <= rows; r++) {
+                ctx.beginPath();
+                ctx.moveTo(0, r * shelfHeight);
+                ctx.lineTo(width, r * shelfHeight);
+                ctx.stroke();
+            }
+
+            // Draw and update books
+            books.forEach(book => {
+                book.update();
+                book.draw();
+            });
+
+            // Handle wrap-around regeneration (simple version)
+            // Just continuously wrapping individual books in the class logic above
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        animate();
+    </script>
 </body>
 </html>
