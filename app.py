@@ -679,5 +679,7 @@ def delete_movie(movie_id):
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    init_db()
+    if os.environ.get("SKIP_DB_INIT") != "true":
+        init_db()
+    
     app.run(host='0.0.0.0', port=5000)
