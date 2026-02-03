@@ -11,7 +11,7 @@
             --bg-color: #0d1117;
             --card-bg: rgba(22, 27, 34, 0.85);
             --text-main: #ffffff;
-            --text-muted: #c9d1d9; /* High visibility grey */
+            --text-muted: #c9d1d9;
             --accent-color: #238636;
             --accent-hover: #2ea043;
             --border-color: #30363d;
@@ -38,7 +38,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            filter: blur(6px); /* Slightly less blur to see DVD details */
+            filter: blur(6px);
             opacity: 0.5;
         }
 
@@ -118,7 +118,7 @@
         <div class="mb-3">
             <img src="{{ site_logo }}" alt="Hylla Logo" class="logo-img">
             <h1 class="h3 mb-2">Welcome Back</h1>
-            <p class="text-instructions">Please sign in to access the Media Database.</p>
+            <p class="text-instructions">Please sign in to access Hylla.</p>
         </div>
 
         <div class="d-grid gap-2">
@@ -141,11 +141,10 @@
 
         let width, height;
         let dvds = [];
-        const shelfHeight = 140; // Slightly taller for DVD spacing
-        const dvdWidth = 20;     // Standard spine width
-        const speed = 0.5;       // Scroll speed
+        const shelfHeight = 140; 
+        const dvdWidth = 20;     
+        const speed = 0.5;       
         
-        // DVD spine colors
         const colors = [
             '#238636', '#1f6feb', '#a371f7', '#d29922', 
             '#e5534b', '#f0883e', '#58a6ff', '#3fb950'
@@ -162,35 +161,28 @@
                 this.x = x;
                 this.y = y;
                 this.w = dvdWidth;
-                this.h = shelfHeight - 20; // Uniform height for DVDs
+                this.h = shelfHeight - 20; 
                 this.color = colors[Math.floor(Math.random() * colors.length)];
                 
-                // Start invisible
                 this.visible = false;
                 this.alpha = 0; 
             }
 
             update() {
-                // Scroll
                 this.x -= speed;
                 
-                // Wrap around
                 if (this.x + this.w < 0) {
                     this.x = width;
-                    // When wrapping, reset visibility to empty so it can be "filled" again later
-                    // or keep it filled? Let's reset to allow constant activity.
-                    if(Math.random() > 0.8) { // Keep some, clear others
+                    if(Math.random() > 0.8) { 
                         this.visible = false;
                         this.alpha = 0;
                     }
                 }
 
-                // Randomly add DVD if spot is empty
                 if (!this.visible && Math.random() < 0.002) {
                     this.visible = true;
                 }
 
-                // Fade in effect
                 if (this.visible && this.alpha < 1) {
                     this.alpha += 0.02;
                 }
@@ -201,15 +193,15 @@
                 
                 ctx.globalAlpha = this.alpha;
                 
-                // Draw Plastic Case (Dark Grey/Black top and bottom)
-                ctx.fillStyle = "#161b22"; // Case color
+                // Case
+                ctx.fillStyle = "#161b22"; 
                 ctx.fillRect(this.x, this.y - this.h, this.w, this.h);
 
-                // Draw Spine Label (The colored part, slightly smaller than full case)
+                // Spine
                 ctx.fillStyle = this.color;
                 ctx.fillRect(this.x + 2, this.y - this.h + 5, this.w - 4, this.h - 10);
 
-                // Highlight/Reflection to make it look plastic
+                // Reflection
                 ctx.fillStyle = "rgba(255,255,255,0.1)";
                 ctx.fillRect(this.x, this.y - this.h, this.w / 2, this.h);
 
@@ -223,16 +215,14 @@
             
             for (let r = 0; r < rows; r++) {
                 let currentX = 0;
-                // Offset every other row
                 if(r % 2 !== 0) currentX = -30; 
 
                 const y = (r + 1) * shelfHeight;
                 
-                // Create slots for DVDs across the entire width
                 while (currentX < width + 100) {
                     const dvd = new DVD(currentX, y);
                     dvds.push(dvd);
-                    currentX += dvdWidth + 2; // +2 for gap
+                    currentX += dvdWidth + 2; 
                 }
             }
         }
@@ -240,19 +230,16 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
-            // Draw shelf lines (Wood/Metal texture color)
             ctx.strokeStyle = '#30363d';
             ctx.lineWidth = 6;
             const rows = Math.ceil(height / shelfHeight);
             for(let r = 1; r <= rows; r++) {
-                // Draw the shelf itself
                 ctx.beginPath();
                 ctx.moveTo(0, r * shelfHeight);
                 ctx.lineTo(width, r * shelfHeight);
                 ctx.stroke();
             }
 
-            // Update and draw DVDs
             dvds.forEach(dvd => {
                 dvd.update();
                 dvd.draw();
