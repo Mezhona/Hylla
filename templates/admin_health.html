@@ -4,6 +4,75 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold" style="color: var(--primary-color);">
+            <i class="bi bi-clock-history me-2"></i>Audit Log
+        </h2>
+        <a href="/admin/stats" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-2"></i>Back to Stats
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-secondary mb-4 p-3" style="background-color: var(--card-bg);">
+        <form method="GET" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control bg-dark text-white border-secondary" 
+                   placeholder="Search by Movie, User, or Action..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary fw-bold">Filter</button>
+            {% if search_query %}<a href="/admin/audit" class="btn btn-outline-danger">Reset</a>{% endif %}
+        </form>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="color: var(--text-color);">
+                <thead class="bg-light" style="background-color: rgba(255,255,255,0.05)!important;">
+                    <tr>
+                        <th class="ps-4" style="width: 15%;">Time</th>
+                        <th style="width: 15%;">User</th>
+                        <th style="width: 10%;">Action</th>
+                        <th style="width: 60%;">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr style="border-color: var(--border-color);">
+                        <td class="ps-4 text-muted small" style="white-space: nowrap;">
+                            {{ log.timestamp }}
+                        </td>
+                        <td class="fw-bold">
+                            <i class="bi bi-person-circle me-2 text-secondary"></i>{{ log.user_name }}
+                        </td>
+                        <td>
+                            {% if log.action == 'ADDED' %}<span class="badge bg-success">ADDED</span>
+                            {% elif log.action == 'UPDATED' %}<span class="badge bg-primary">UPDATED</span>
+                            {% elif log.action == 'DELETED' %}<span class="badge bg-danger">DELETED</span>
+                            {% else %}<span class="badge bg-secondary">{{ log.action }}</span>{% endif %}
+                        </td>
+                        <td>
+                            <div class="fw-bold text-primary">{{ log.movie_title }}</div>
+                            {% if log.details %}
+                            <div class="small text-muted mt-1" style="font-family: monospace; opacity: 0.8; white-space: pre-wrap;">
+                                <i class="bi bi-info-circle me-1"></i>{{ log.details }}
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">No logs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+root@7d1487c70d82:/app/templates# cat admin_health.html 
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold" style="color: var(--primary-color);">
             <i class="bi bi-activity me-2"></i>System Health
         </h2>
         <div>
