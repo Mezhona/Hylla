@@ -9,9 +9,9 @@
     <style>
         :root {
             --bg-color: #0d1117;
-            --card-bg: rgba(22, 27, 34, 0.85); /* More transparent for glass effect */
+            --card-bg: rgba(22, 27, 34, 0.85);
             --text-main: #ffffff;
-            --text-muted: #8b949e; /* Lighter than before for visibility */
+            --text-muted: #c9d1d9; /* High visibility grey */
             --accent-color: #238636;
             --accent-hover: #2ea043;
             --border-color: #30363d;
@@ -25,7 +25,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Prevent scrollbars from canvas */
+            overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             position: relative;
         }
@@ -38,8 +38,8 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            filter: blur(8px); /* The requested blur effect */
-            opacity: 0.6;
+            filter: blur(6px); /* Slightly less blur to see DVD details */
+            opacity: 0.5;
         }
 
         .login-card {
@@ -47,7 +47,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px); /* Glassmorphism blur behind the card */
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             max-width: 400px;
             width: 90%;
@@ -70,7 +70,7 @@
         }
 
         .text-instructions {
-            color: #c9d1d9; /* Much lighter than 'text-muted' */
+            color: var(--text-muted);
             font-size: 0.95rem;
             margin-bottom: 1.5rem;
         }
@@ -86,6 +86,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            text-decoration: none;
         }
 
         .btn-auth:hover {
@@ -96,7 +97,7 @@
         }
 
         .footer-text {
-            color: #8b949e; /* Lighter gray for better visibility */
+            color: #8b949e;
             font-size: 0.8rem;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -135,29 +136,19 @@
     </div>
 
     <script>
-        /**
-         * Hylla Dynamic Background
-         * Creates a scrolling "bookshelf" effect where books randomly disappear.
-         */
         const canvas = document.getElementById('shelf-canvas');
         const ctx = canvas.getContext('2d');
 
         let width, height;
-        let books = [];
-        const shelfHeight = 120; // Height of one shelf row
-        const bookWidthMin = 15;
-        const bookWidthMax = 40;
-        const bookGap = 2;
-        const speed = 0.5; // How fast the shelves scroll sideways
+        let dvds = [];
+        const shelfHeight = 140; // Slightly taller for DVD spacing
+        const dvdWidth = 20;     // Standard spine width
+        const speed = 0.5;       // Scroll speed
         
-        // Colors for the books (muted professional tones)
+        // DVD spine colors
         const colors = [
-            '#238636', // Hylla Green
-            '#1f6feb', // Blue
-            '#a371f7', // Purple
-            '#d29922', // Gold/Yellow
-            '#30363d', // Dark Grey
-            '#8b949e'  // Light Grey
+            '#238636', '#1f6feb', '#a371f7', '#d29922', 
+            '#e5534b', '#f0883e', '#58a6ff', '#3fb950'
         ];
 
         function resize() {
@@ -166,73 +157,82 @@
             initShelves();
         }
 
-        class Book {
-            constructor(x, y, h, color) {
+        class DVD {
+            constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.w = Math.random() * (bookWidthMax - bookWidthMin) + bookWidthMin;
-                this.h = h * (0.7 + Math.random() * 0.25); // Varying height relative to shelf
-                this.color = color;
-                this.alpha = 1; // For fading out
-                this.removed = false;
-                this.removeDelay = Math.random() * 10000; // Random time before removal
+                this.w = dvdWidth;
+                this.h = shelfHeight - 20; // Uniform height for DVDs
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Start invisible
+                this.visible = false;
+                this.alpha = 0; 
             }
 
             update() {
-                // Scroll movement
+                // Scroll
                 this.x -= speed;
                 
-                // Wrap around screen
+                // Wrap around
                 if (this.x + this.w < 0) {
                     this.x = width;
-                    this.removed = false;
-                    this.alpha = 1;
+                    // When wrapping, reset visibility to empty so it can be "filled" again later
+                    // or keep it filled? Let's reset to allow constant activity.
+                    if(Math.random() > 0.8) { // Keep some, clear others
+                        this.visible = false;
+                        this.alpha = 0;
+                    }
                 }
 
-                // Randomly remove book
-                if (!this.removed && Math.random() < 0.001) { // 0.1% chance per frame to trigger removal
-                     this.removed = true;
+                // Randomly add DVD if spot is empty
+                if (!this.visible && Math.random() < 0.002) {
+                    this.visible = true;
                 }
 
-                // Fade out effect
-                if (this.removed && this.alpha > 0) {
-                    this.alpha -= 0.05;
+                // Fade in effect
+                if (this.visible && this.alpha < 1) {
+                    this.alpha += 0.02;
                 }
             }
 
             draw() {
                 if (this.alpha <= 0) return;
                 
-                ctx.fillStyle = this.color;
                 ctx.globalAlpha = this.alpha;
-                // Draw book spine
+                
+                // Draw Plastic Case (Dark Grey/Black top and bottom)
+                ctx.fillStyle = "#161b22"; // Case color
                 ctx.fillRect(this.x, this.y - this.h, this.w, this.h);
-                
-                // Draw little spine detail (highlight)
+
+                // Draw Spine Label (The colored part, slightly smaller than full case)
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x + 2, this.y - this.h + 5, this.w - 4, this.h - 10);
+
+                // Highlight/Reflection to make it look plastic
                 ctx.fillStyle = "rgba(255,255,255,0.1)";
-                ctx.fillRect(this.x + 2, this.y - this.h, 2, this.h);
-                
-                ctx.globalAlpha = 1; // Reset alpha
+                ctx.fillRect(this.x, this.y - this.h, this.w / 2, this.h);
+
+                ctx.globalAlpha = 1;
             }
         }
 
         function initShelves() {
-            books = [];
+            dvds = [];
             const rows = Math.ceil(height / shelfHeight);
             
             for (let r = 0; r < rows; r++) {
                 let currentX = 0;
-                // Add an offset to every other row for visual variety
-                if(r % 2 !== 0) currentX = -50; 
+                // Offset every other row
+                if(r % 2 !== 0) currentX = -30; 
 
                 const y = (r + 1) * shelfHeight;
                 
-                // Fill row with books
-                while (currentX < width + 200) { // +200 buffer for scrolling
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    const book = new Book(currentX, y, shelfHeight - 10, color);
-                    books.push(book);
-                    currentX += book.w + bookGap;
+                // Create slots for DVDs across the entire width
+                while (currentX < width + 100) {
+                    const dvd = new DVD(currentX, y);
+                    dvds.push(dvd);
+                    currentX += dvdWidth + 2; // +2 for gap
                 }
             }
         }
@@ -240,25 +240,23 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
-            // Draw shelf lines
+            // Draw shelf lines (Wood/Metal texture color)
             ctx.strokeStyle = '#30363d';
-            ctx.lineWidth = 4;
+            ctx.lineWidth = 6;
             const rows = Math.ceil(height / shelfHeight);
             for(let r = 1; r <= rows; r++) {
+                // Draw the shelf itself
                 ctx.beginPath();
                 ctx.moveTo(0, r * shelfHeight);
                 ctx.lineTo(width, r * shelfHeight);
                 ctx.stroke();
             }
 
-            // Draw and update books
-            books.forEach(book => {
-                book.update();
-                book.draw();
+            // Update and draw DVDs
+            dvds.forEach(dvd => {
+                dvd.update();
+                dvd.draw();
             });
-
-            // Handle wrap-around regeneration (simple version)
-            // Just continuously wrapping individual books in the class logic above
 
             requestAnimationFrame(animate);
         }
