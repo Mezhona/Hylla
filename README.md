@@ -9,7 +9,6 @@
 
 **Hylla** (Norwegian for *"Shelf"*) is a simple, self-hosted media manager designed for collectors who straddle the line between physical media and digital libraries. 
 
-While Plex/Jellyfin manage your *files*, **Hylla** manages your *ownership*.
 
 ##  Features
 
